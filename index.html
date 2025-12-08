@@ -2,7 +2,10 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Primary Question Creator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -20,7 +23,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
         }
 
         .container {
@@ -29,22 +32,46 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 900px;
             width: 100%;
-            padding: 40px;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            .container {
+                padding: 40px;
+            }
         }
 
         h1 {
             text-align: center;
             color: #667eea;
-            margin-bottom: 10px;
-            font-size: 2.5em;
+            margin-bottom: 8px;
+            font-size: 1.8em;
             font-weight: 700;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+                margin-bottom: 10px;
+            }
         }
 
         .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-size: 1em;
+        }
+
+        @media (min-width: 768px) {
+            .subtitle {
+                font-size: 1.1em;
+                margin-bottom: 30px;
+            }
         }
 
         .input-section {
@@ -57,6 +84,32 @@
             font-weight: 600;
             color: #333;
             font-size: 1.1em;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            color: #1976D2;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            color: #1976D2;
         }
 
         textarea {
@@ -78,19 +131,32 @@
 
         .button-container {
             text-align: center;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 40px;
-            font-size: 1.2em;
+            padding: 14px 35px;
+            font-size: 1.1em;
             font-weight: 600;
             border-radius: 50px;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 768px) {
+            button {
+                padding: 15px 40px;
+                font-size: 1.2em;
+            }
         }
 
         button:hover {
@@ -107,17 +173,34 @@
             cursor: not-allowed;
         }
 
+        .fix-btn {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+        }
+
+        .fix-btn:hover {
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+        }
+
         .example {
             background: #f5f5f5;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             margin-top: 20px;
-            font-size: 0.9em;
+            font-size: 0.85em;
+        }
+
+        @media (min-width: 768px) {
+            .example {
+                padding: 15px;
+                font-size: 0.9em;
+            }
         }
 
         .example h3 {
             color: #667eea;
             margin-bottom: 10px;
+            font-size: 1.1em;
         }
 
         .example pre {
@@ -125,25 +208,50 @@
             padding: 10px;
             border-radius: 5px;
             overflow-x: auto;
-            font-size: 12px;
+            font-size: 11px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (min-width: 768px) {
+            .example pre {
+                font-size: 12px;
+            }
         }
 
         .error {
             color: #e74c3c;
             background: #fadbd8;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
             display: none;
+            font-size: 0.9em;
+        }
+
+        @media (min-width: 768px) {
+            .error {
+                padding: 15px;
+                margin-top: 20px;
+                font-size: 1em;
+            }
         }
 
         .success {
             color: #27ae60;
             background: #d5f4e6;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            margin-top: 20px;
+            margin-top: 15px;
             display: none;
+            font-size: 0.9em;
+        }
+
+        @media (min-width: 768px) {
+            .success {
+                padding: 15px;
+                margin-top: 20px;
+                font-size: 1em;
+            }
         }
 
         /* PDF Content Styles */
@@ -275,11 +383,24 @@
         <p class="subtitle">প্রাথমিক শিক্ষা প্রশ্নপত্র জেনারেটর</p>
         
         <div class="input-section">
+            <label for="examId">Exam ID:</label>
+            <div class="exam-id-container">
+                <div class="exam-id-input-wrapper">
+                    <input type="number" id="examId" placeholder="Enter exam ID (e.g., 115)">
+                </div>
+                <button class="copy-link-btn" onclick="generateAndCopyLink()">📋 Copy Link</button>
+            </div>
+            <div id="generatedLink" class="generated-link"></div>
+        </div>
+
+        <div class="input-section">
             <label for="jsonInput">JSON Question Data:</label>
             <textarea id="jsonInput" placeholder='Paste your JSON data here...'></textarea>
         </div>
 
         <div class="button-container">
+            <button class="copy-json-btn" onclick="copyJSON()">📄 Copy JSON</button>
+            <button class="fix-btn" onclick="fixJSON()">🔧 Fix JSON</button>
             <button id="generateBtn" onclick="generatePDF()">Create MCQ PDF</button>
         </div>
 
@@ -287,6 +408,12 @@
         <div id="successMsg" class="success"></div>
 
         <div class="example">
+            <h3>How to Use:</h3>
+            <p style="margin-bottom: 10px;"><strong>Step 1:</strong> Enter exam ID (e.g., 115) and click "📋 Copy Link"</p>
+            <p style="margin-bottom: 10px;"><strong>Step 2:</strong> Open the link in your browser and copy the JSON response</p>
+            <p style="margin-bottom: 10px;"><strong>Step 3:</strong> Paste JSON data in the textarea below</p>
+            <p style="margin-bottom: 10px;"><strong>Step 4:</strong> Use "🔧 Fix JSON" if data is broken or "📄 Copy JSON" to copy it</p>
+            <p style="margin-bottom: 15px;"><strong>Step 5:</strong> Click "Create MCQ PDF" to generate your exam paper</p>
             <h3>JSON Format Example:</h3>
             <pre>{
   "data": {
@@ -340,6 +467,172 @@
             successDiv.textContent = message;
             successDiv.style.display = 'block';
             errorDiv.style.display = 'none';
+            
+            // Auto-hide success message after 3 seconds
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function generateAndCopyLink() {
+            const examId = document.getElementById('examId').value.trim();
+            const generatedLinkDiv = document.getElementById('generatedLink');
+            
+            if (!examId) {
+                showError('Please enter an exam ID!');
+                return;
+            }
+
+            const apiLink = `https://bcspreli.free.nf/api/take-exam/start.php?exam_id=${examId}`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(apiLink).then(() => {
+                showSuccess('✅ API link copied to clipboard!');
+                
+                // Display the link
+                generatedLinkDiv.innerHTML = `
+                    <strong>Generated Link:</strong><br>
+                    <a href="${apiLink}" target="_blank">${apiLink}</a>
+                `;
+                generatedLinkDiv.style.display = 'block';
+            }).catch(err => {
+                showError('Failed to copy link: ' + err.message);
+            });
+        }
+
+        function copyJSON() {
+            const jsonInput = document.getElementById('jsonInput');
+            const content = jsonInput.value.trim();
+
+            if (!content) {
+                showError('No JSON data to copy!');
+                return;
+            }
+
+            navigator.clipboard.writeText(content).then(() => {
+                showSuccess('✅ JSON data copied to clipboard!');
+            }).catch(err => {
+                showError('Failed to copy JSON: ' + err.message);
+            });
+        }
+
+        function fixJSON() {
+            const jsonInput = document.getElementById('jsonInput');
+            let content = jsonInput.value.trim();
+
+            if (!content) {
+                showError('Please paste some JSON data first!');
+                return;
+            }
+
+            try {
+                // Try to fix common JSON issues
+                let fixed = content;
+
+                // Remove any leading/trailing whitespace
+                fixed = fixed.trim();
+
+                // Fix single quotes to double quotes
+                fixed = fixed.replace(/'/g, '"');
+
+                // Remove trailing commas before closing brackets/braces
+                fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
+
+                // Add missing commas between objects in arrays
+                fixed = fixed.replace(/}(\s*){/g, '},\n{');
+                
+                // Fix unquoted keys (basic attempt)
+                fixed = fixed.replace(/(\w+):/g, '"$1":');
+
+                // Remove duplicate quotes
+                fixed = fixed.replace(/""+/g, '"');
+
+                // Try to parse it
+                let parsed = JSON.parse(fixed);
+
+                // Validate structure
+                const data = parsed.data || parsed;
+                
+                if (!data.details) {
+                    // Try to create a basic structure
+                    if (!parsed.data) {
+                        parsed = { data: parsed };
+                    }
+                    if (!parsed.data.details) {
+                        parsed.data.details = {
+                            duration: 60,
+                            total_marks: "100.00"
+                        };
+                    }
+                }
+
+                if (!data.questions || !Array.isArray(data.questions)) {
+                    throw new Error('Questions array not found or invalid');
+                }
+
+                // Validate and fix each question
+                parsed.data.questions = data.questions.map((q, index) => {
+                    const fixedQ = {
+                        id: q.id || (2781 + index),
+                        question: q.question || `Question ${index + 1}`,
+                        options: {},
+                        answer: q.answer || 'A'
+                    };
+
+                    // Fix options
+                    if (q.options) {
+                        if (Array.isArray(q.options)) {
+                            // Convert array to object
+                            fixedQ.options = {
+                                A: q.options[0] || 'Option A',
+                                B: q.options[1] || 'Option B',
+                                C: q.options[2] || 'Option C',
+                                D: q.options[3] || 'Option D'
+                            };
+                        } else {
+                            fixedQ.options = {
+                                A: q.options.A || q.options.a || 'Option A',
+                                B: q.options.B || q.options.b || 'Option B',
+                                C: q.options.C || q.options.c || 'Option C',
+                                D: q.options.D || q.options.d || 'Option D'
+                            };
+                        }
+                    } else {
+                        fixedQ.options = {
+                            A: 'Option A',
+                            B: 'Option B',
+                            C: 'Option C',
+                            D: 'Option D'
+                        };
+                    }
+
+                    return fixedQ;
+                });
+
+                // Format nicely with indentation
+                const formatted = JSON.stringify(parsed, null, 2);
+                jsonInput.value = formatted;
+                
+                showSuccess(`✅ JSON fixed successfully! Found ${data.questions.length} questions.`);
+            } catch (e) {
+                // If parsing still fails, try more aggressive fixes
+                try {
+                    // Last resort: try to extract what looks like JSON
+                    const jsonMatch = content.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        let extracted = jsonMatch[0];
+                        extracted = extracted.replace(/'/g, '"');
+                        extracted = extracted.replace(/,(\s*[}\]])/g, '$1');
+                        const parsed = JSON.parse(extracted);
+                        jsonInput.value = JSON.stringify(parsed, null, 2);
+                        showSuccess('✅ JSON partially recovered and formatted!');
+                    } else {
+                        throw new Error('Could not extract valid JSON');
+                    }
+                } catch (finalError) {
+                    showError(`❌ Could not fix JSON: ${e.message}. Please check your JSON structure manually.`);
+                }
+            }
         }
 
         async function generatePDF() {
@@ -351,25 +644,30 @@
                 return;
             }
 
-            let parsedData;
-            try {
-                parsedData = JSON.parse(jsonInput);
-            } catch (e) {
-                showError('Invalid JSON format! Please check your data.');
-                return;
-            }
-
-            const data = parsedData.data || parsedData;
-
-            if (!data.details || !data.questions) {
-                showError('JSON must contain "details" and "questions" fields!');
-                return;
-            }
+            let data;
 
             try {
                 generateBtn.disabled = true;
                 generateBtn.textContent = 'Generating PDF...';
-                
+
+                // Parse JSON input
+                try {
+                    const parsedData = JSON.parse(jsonInput);
+                    data = parsedData.data || parsedData;
+                } catch (parseError) {
+                    showError('Invalid JSON format! Please check your data.');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Create MCQ PDF';
+                    return;
+                }
+
+                if (!data.details || !data.questions) {
+                    showError('Data must contain "details" and "questions" fields!');
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = 'Create MCQ PDF';
+                    return;
+                }
+
                 await createPDF(data);
                 
                 showSuccess('PDF generated successfully!');
