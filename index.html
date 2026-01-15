@@ -123,7 +123,27 @@
                 padding: 0;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-                /* Background color will be set via JS inline style on document.body */
+                counter-reset: page;
+                /* Initialize page counter */
+            }
+
+            .page-footer {
+                position: fixed;
+                bottom: 8mm;
+                /* Slightly lower */
+                left: 20mm;
+                right: 20mm;
+                text-align: center;
+                font-size: 0.85rem;
+                border-top: 1px solid #000;
+                padding-top: 4px;
+                /* Background removed to avoid white box on colored PDF */
+            }
+
+            /* CSS Counter for Page Numbering */
+            .page-number::after {
+                counter-increment: page;
+                content: "পৃষ্ঠা " counter(page);
             }
 
             #ui-container {
@@ -134,17 +154,11 @@
                 display: block !important;
             }
 
-            /* Safe Area Wrapper */
             .page-content-wrapper {
-                /* Fixed padding as per requirements */
-                padding: 25mm 20mm 25mm 20mm;
+                padding: 25mm 20mm 35mm 20mm;
                 box-sizing: border-box;
                 width: 210mm;
-                /* A4 width */
                 min-height: 297mm;
-                /* Full page height ensuring color covers even if content is short */
-
-                /* Ensure text never flows out */
                 overflow: visible;
             }
 
@@ -212,10 +226,7 @@
                 font-size: 0.9rem;
             }
 
-            /* Page 2+: Questions Page */
-            .questions-page {
-                /* Continues flow. If it needs multiple pages, browser handles it. */
-            }
+
 
             .questions-header {
                 display: flex;
@@ -526,8 +537,14 @@
 
             // --- CUSTOM FOOTER (Repeating) ---
             const footer = document.createElement('div');
-            footer.className = 'page-footer';
-            footer.innerHTML = `${finalTitle} | Set: ${set.name} (${set.num})`;
+            footer.className = 'page-footer exam-text';
+            // Using a container for title and the page number span
+            footer.innerHTML = `
+                <div style="display:flex; justify-content:space-between;">
+                    <span>${finalTitle}</span>
+                    <span class="page-number"></span>
+                </div>
+            `;
             container.appendChild(footer);
 
             /* --- PAGE 1: COVER --- */
