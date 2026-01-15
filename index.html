@@ -1,865 +1,703 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Primary Question Creator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam PDF Generator</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* -----------------------------------------------------------
+           UI STYLES (Screen Only)
+           ----------------------------------------------------------- */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-ui: #f8fafc;
+            --text-ui: #1e293b;
+            --border-ui: #cbd5e1;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-ui);
+            color: var(--text-ui);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
         }
 
-        .container {
+        #ui-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 20px;
-        }
-
-        @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            
-            .container {
-                padding: 40px;
-            }
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
         h1 {
+            margin-top: 0;
             text-align: center;
-            color: #667eea;
-            margin-bottom: 8px;
-            font-size: 1.8em;
-            font-weight: 700;
+            color: var(--primary);
         }
 
-        @media (min-width: 768px) {
-            h1 {
-                font-size: 2.5em;
-                margin-bottom: 10px;
-            }
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 1em;
+        .section {
+            margin-bottom: 2rem;
         }
 
-        @media (min-width: 768px) {
-            .subtitle {
-                font-size: 1.1em;
-                margin-bottom: 30px;
-            }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 1rem;
         }
 
-        .input-section {
-            margin-bottom: 30px;
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-ui);
+            border-radius: 6px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 10px;
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
             font-weight: 600;
-            color: #333;
-            font-size: 1.1em;
+            transition: background 0.2s;
         }
 
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 12px 15px;
-            margin-top: 15px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-
-        .info-box strong {
-            color: #1976D2;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 12px 15px;
-            margin-top: 15px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-
-        .info-box strong {
-            color: #1976D2;
+        button:hover {
+            background-color: var(--primary-hover);
         }
 
         textarea {
             width: 100%;
-            min-height: 300px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .button-container {
-            text-align: center;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 35px;
-            font-size: 1.1em;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        @media (min-width: 768px) {
-            button {
-                padding: 15px 40px;
-                font-size: 1.2em;
-            }
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .fix-btn {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
-        }
-
-        .fix-btn:hover {
-            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
-        }
-
-        .example {
-            background: #f5f5f5;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 20px;
-            font-size: 0.85em;
-        }
-
-        @media (min-width: 768px) {
-            .example {
-                padding: 15px;
-                font-size: 0.9em;
-            }
-        }
-
-        .example h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .example pre {
-            background: white;
+            height: 200px;
             padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-size: 11px;
-            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border-ui);
+            border-radius: 6px;
+            font-family: monospace;
+            resize: vertical;
         }
 
-        @media (min-width: 768px) {
-            .example pre {
-                font-size: 12px;
-            }
-        }
-
-        .error {
-            color: #e74c3c;
-            background: #fadbd8;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
+        #json-error {
+            color: #dc2626;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
             display: none;
-            font-size: 0.9em;
         }
 
-        @media (min-width: 768px) {
-            .error {
-                padding: 15px;
-                margin-top: 20px;
-                font-size: 1em;
-            }
+        .full-width-btn {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 15px;
+            margin-top: 1rem;
         }
 
-        .success {
-            color: #27ae60;
-            background: #d5f4e6;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
+        /* -----------------------------------------------------------
+           PRINT STYLES (The PDF Generator Core)
+           ----------------------------------------------------------- */
+        #print-container {
             display: none;
-            font-size: 0.9em;
         }
 
-        @media (min-width: 768px) {
-            .success {
-                padding: 15px;
-                margin-top: 20px;
-                font-size: 1em;
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+                /* CRITICAL: Edge-to-edge background */
             }
-        }
 
-        /* PDF Content Styles */
-        #pdfContent {
-            position: fixed;
-            top: 0;
-            left: -10000px;
-            background: white;
-            width: 793px;
-            padding: 50px;
-            font-family: Arial, sans-serif;
-        }
+            body {
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                /* Background color will be set via JS inline style on document.body */
+            }
 
-        .pdf-page {
-            width: 693px;
-            background: white;
-        }
+            #ui-container {
+                display: none !important;
+            }
 
-        .pdf-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 15px;
-        }
+            #print-container {
+                display: block !important;
+            }
 
-        .pdf-main-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
+            /* Safe Area Wrapper */
+            .page-content-wrapper {
+                /* Fixed padding as per requirements */
+                padding: 25mm 20mm 25mm 20mm;
+                box-sizing: border-box;
+                width: 210mm;
+                /* A4 width */
+                min-height: 297mm;
+                /* Full page height ensuring color covers even if content is short */
 
-        .pdf-sub-title {
-            font-size: 17px;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
+                /* Ensure text never flows out */
+                overflow: visible;
+            }
 
-        .pdf-details {
-            font-size: 12px;
-            font-weight: bold;
-        }
+            /* Global Typography for Exam */
+            .exam-text {
+                font-family: 'Kalpurush', 'Nirmala UI', sans-serif;
+                /* Fallback to system Bangla */
+                color: #000;
+            }
 
-        .pdf-body {
-            display: flex;
-            gap: 30px;
-            margin-top: 15px;
-        }
+            /* Page 1: Cover Page */
+            .cover-page {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                height: calc(297mm - 50mm);
+                /* Approximate content height */
+                page-break-after: always;
+                position: relative;
+            }
 
-        .pdf-column {
-            flex: 1;
-            width: 331px;
-        }
+            .set-info-top {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                font-weight: bold;
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
 
-        .question-item {
-            margin-bottom: 12px;
-        }
+            .exam-title-block {
+                margin-top: 3rem;
+                margin-bottom: 3rem;
+            }
 
-        .question-number {
-            font-weight: bold;
-            display: inline;
-            font-size: 12px;
-        }
+            .exam-title-block h1 {
+                font-size: 2.5rem;
+                color: #000;
+                margin-bottom: 0.5rem;
+            }
 
-        .question-text {
-            display: inline;
-            font-size: 12px;
-            line-height: 1.5;
-        }
+            .exam-year {
+                font-size: 2rem;
+                font-weight: bold;
+            }
 
-        .options {
-            margin-top: 4px;
-            margin-left: 12px;
-        }
+            .exam-meta {
+                margin: 2rem 0;
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
 
-        .option-item {
-            font-size: 11px;
-            line-height: 1.4;
-            margin-bottom: 2px;
-        }
+            .instructions {
+                margin-top: auto;
+                width: 100%;
+                border-top: 2px solid #000;
+                padding-top: 1rem;
+                text-align: left;
+                font-size: 0.95rem;
+            }
 
-        .option-label {
-            font-weight: 500;
-        }
+            .instruction-note {
+                margin-top: 0.5rem;
+                font-size: 0.9rem;
+            }
 
-        /* Answer Key Styles */
-        .answer-key-page {
-            width: 693px;
-            background: white;
-            padding-top: 20px;
-        }
+            /* Page 2+: Questions Page */
+            .questions-page {
+                /* Continues flow. If it needs multiple pages, browser handles it. */
+            }
 
-        .answer-key-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            text-decoration: underline;
-        }
+            .questions-header {
+                display: flex;
+                justify-content: space-between;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                border-bottom: 1px solid #000;
+                padding-bottom: 0.5rem;
+            }
 
-        .answer-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px 15px;
-            padding: 0 20px;
-        }
+            .question-columns {
+                column-count: 2;
+                column-gap: 10mm;
+                /* 1cm gap */
+                widows: 2;
+                orphans: 2;
+            }
 
-        .answer-item {
-            font-size: 12px;
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            background: #f9f9f9;
-        }
+            .question-item {
+                break-inside: avoid;
+                -webkit-column-break-inside: avoid;
+                page-break-inside: avoid;
+                /* Robust formatting */
+                display: inline-block;
+                width: 100%;
+                margin-bottom: 1rem;
+                text-align: justify;
+                font-size: 0.95rem;
+            }
 
-        .answer-num {
-            font-weight: bold;
-            margin-right: 5px;
-        }
+            .page-footer {
+                position: fixed;
+                bottom: 10mm;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 0.8rem;
+                border-top: 1px solid #ccc;
+                padding-top: 5px;
+                background: white;
+                /* Cover anything behind */
+            }
 
-        .answer-value {
-            color: #2c5aa0;
-            font-weight: 600;
+            .q-text {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 0.3rem;
+            }
+
+            .q-options {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .q-options.horizontal {
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+
+            .q-options.vertical {
+                flex-direction: column;
+            }
+
+            .q-opt {
+                display: flex;
+                gap: 0.4rem;
+                align-items: baseline;
+            }
+
+            /* Final Page: Answer Key */
+            .answer-key-section {
+                break-before: page;
+                margin-top: 2rem;
+            }
+
+            .answer-header {
+                text-align: center;
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 1.5rem;
+            }
+
+            .answer-grid {
+                column-count: 5;
+                column-gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .answer-item {
+                break-inside: avoid;
+                margin-bottom: 0.2rem;
+            }
+
+            /* OMR Sheet Styles */
+            .omr-section {
+                break-before: page;
+                margin-top: 0;
+            }
+
+            .omr-header {
+                text-align: center;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+
+            .omr-grid-container {
+                column-count: 4;
+                /* 4 columns of bubbles to save space */
+                column-gap: 15px;
+                width: 100%;
+            }
+
+            .omr-row {
+                break-inside: avoid;
+                display: flex;
+                align-items: center;
+                margin-bottom: 8px;
+                gap: 8px;
+                font-family: sans-serif;
+                /* System font for bubbles usually clearer, but we can stick to 'Kalpurush' if preferred. 
+                   Let's use system sans-serif for clean circles */
+            }
+
+            .omr-q-num {
+                width: 30px;
+                text-align: right;
+                font-weight: bold;
+                font-family: 'Kalpurush', sans-serif;
+            }
+
+            .omr-bubbles {
+                display: flex;
+                gap: 8px;
+            }
+
+            .omr-bubble {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 1px solid #000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+                color: #444;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Question Creator</h1>
-        <p class="subtitle">প্রশ্নপত্র জেনারেটর</p>
-        
-        <div class="input-section">
-            <label for="examId">Exam ID:</label>
-            <div class="exam-id-container">
-                <div class="exam-id-input-wrapper">
-                    <input type="number" id="examId" placeholder="Enter exam ID (e.g., 115)">
-                </div>
-                <button class="copy-link-btn" onclick="generateAndCopyLink()">📋 Copy Link</button>
+
+    <!-- UI SECTION -->
+    <div id="ui-container">
+        <h1>Exam PDF Generator</h1>
+
+        <!-- Section 1 -->
+        <div class="section">
+            <h2>1. Get JSON</h2>
+            <div class="input-group">
+                <input type="text" id="examId" placeholder="Enter Exam ID (e.g., 101)">
+                <button onclick="openApiLink()">GO</button>
             </div>
-            <div id="generatedLink" class="generated-link"></div>
+            <small style="color: #64748b;">Click GO to open data link. Copy raw JSON from there.</small>
         </div>
 
-        <div class="input-section">
-            <label for="jsonInput">JSON Question Data:</label>
-            <textarea id="jsonInput" placeholder='Paste your JSON data here...'></textarea>
+        <!-- Section 2 -->
+        <div class="section">
+            <h2>2. Paste Data</h2>
+            <label for="jsonInput" style="display:block; margin-bottom:0.5rem;">Paste raw JSON here:</label>
+            <textarea id="jsonInput" placeholder='{"success": true, "data": { ... }}'></textarea>
+            <div id="json-error">Invalid JSON format. Please check your data.</div>
         </div>
 
-        <div class="button-container">
-            <button class="copy-json-btn" onclick="copyJSON()">📄 Copy JSON</button>
-            <button class="fix-btn" onclick="fixJSON()">🔧 Fix JSON</button>
-            <button id="generateBtn" onclick="generatePDF()">Create MCQ PDF</button>
+        <!-- Section 3 -->
+        <div class="section">
+            <h2>3. Exam Details (Optional)</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label style="font-size: 0.9rem; font-weight: bold;">Exam Title</label>
+                    <input type="text" id="customTitle" placeholder="Default: প্রিলিমিনারি টেস্ট">
+                </div>
+                <div>
+                    <label style="font-size: 0.9rem; font-weight: bold;">Year</label>
+                    <input type="text" id="customYear" placeholder="Default: 2026">
+                </div>
+                <div>
+                    <label style="font-size: 0.9rem; font-weight: bold;">Time</label>
+                    <input type="text" id="customTime" placeholder="Default from JSON">
+                </div>
+                <div>
+                    <label style="font-size: 0.9rem; font-weight: bold;">Full Marks</label>
+                    <input type="text" id="customMarks" placeholder="Default from JSON">
+                </div>
+            </div>
         </div>
 
-        <div id="errorMsg" class="error"></div>
-        <div id="successMsg" class="success"></div>
-
-        <div class="example">
-            <h3>How to Use:</h3>
-            <p style="margin-bottom: 10px;"><strong>Step 1:</strong> Enter exam ID (e.g., 115) and click "📋 Copy Link"</p>
-            <p style="margin-bottom: 10px;"><strong>Step 2:</strong> Open the link in your browser and copy the JSON response</p>
-            <p style="margin-bottom: 10px;"><strong>Step 3:</strong> Paste JSON data in the textarea below</p>
-            <p style="margin-bottom: 10px;"><strong>Step 4:</strong> Use "🔧 Fix JSON" if data is broken or "📄 Copy JSON" to copy it</p>
-            <p style="margin-bottom: 15px;"><strong>Step 5:</strong> Click "Create MCQ PDF" to generate your exam paper</p>
-            <h3>JSON Format Example:</h3>
-            <pre>{
-  "data": {
-    "details": {
-      "duration": 60,
-      "total_marks": "80.00"
-    },
-    "questions": [
-      {
-        "question": "বাংলাদেশের রাজধানী কোনটি?",
-        "options": {
-          "A": "ঢাকা",
-          "B": "চট্টগ্রাম",
-          "C": "সিলেট",
-          "D": "রাজশাহী"
-        },
-        "answer": "A"
-      }
-    ]
-  }
-}</pre>
+        <!-- Section 4 -->
+        <div class="section">
+            <button class="full-width-btn" onclick="processAndPrint()">Generate PDF Questions</button>
         </div>
     </div>
 
-    <div id="pdfContent"></div>
+    <!-- PRINT SECTION -->
+    <div id="print-container">
+        <!-- Content injected via JS -->
+    </div>
 
     <script>
-        const { jsPDF } = window.jspdf;
+        // -----------------------------------------------------------
+        // CONFIG & UTILS
+        // -----------------------------------------------------------
+        const BG_COLORS = [
+            '#FFE4E1', // Light Pink
+            '#FFFFE0', // Light Yellow
+            '#F0FFF0', // Pastel Green
+            '#F5F5F5'  // Ash / Light Grey
+        ];
 
-        // Bangla number conversion
-        const banglaNumbers = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-        function toBanglaNumber(num) {
-            return String(num).split('').map(d => banglaNumbers[parseInt(d)] || d).join('');
+        const SETS = [
+            { num: '১', name: 'পদ্মা' },
+            { num: '২', name: 'মেঘনা' },
+            { num: '৩', name: 'যমুনা' },
+            { num: '৪', name: 'কর্ণফুলী' },
+            { num: '৫', name: 'শাপলা' },
+            { num: '৬', name: 'গোলাপ' },
+            { num: '৭', name: 'জুঁই' },
+            { num: '৮', name: 'রজনীগন্ধা' }
+        ];
+
+        const BANGLA_DIGITS = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+        const BANGLA_OPTIONS = { 'A': 'ক', 'B': 'খ', 'C': 'গ', 'D': 'ঘ' };
+
+        // Helper to convert English number string to Bangla
+        function toBanglaNum(numStr) {
+            return numStr.toString().replace(/\d/g, d => BANGLA_DIGITS[d]);
         }
 
-        // Bangla option letters
-        const banglaOptions = ['ক', 'খ', 'গ', 'ঘ'];
-        const englishToBangla = {'A': 'ক', 'B': 'খ', 'C': 'গ', 'D': 'ঘ'};
-
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMsg');
-            const successDiv = document.getElementById('successMsg');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            successDiv.style.display = 'none';
+        // Helper to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
-        function showSuccess(message) {
-            const errorDiv = document.getElementById('errorMsg');
-            const successDiv = document.getElementById('successMsg');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            errorDiv.style.display = 'none';
-            
-            // Auto-hide success message after 3 seconds
+        // -----------------------------------------------------------
+        // UI ACTIONS
+        // -----------------------------------------------------------
+        function openApiLink() {
+            const id = document.getElementById('examId').value.trim();
+            if (!id) return alert('Please enter an Exam ID');
+            const url = `https://bcspreli.free.nf/api/take-exam/start.php?exam_id=${id}`;
+            window.open(url, '_blank');
+        }
+
+        function validateJSON() {
+            const raw = document.getElementById('jsonInput').value;
+            const errDiv = document.getElementById('json-error');
+            try {
+                const parsed = JSON.parse(raw);
+                if (!parsed.success || !parsed.data) throw new Error('Invalid Schema');
+                errDiv.style.display = 'none';
+                return parsed.data;
+            } catch (e) {
+                errDiv.style.display = 'block';
+                errDiv.textContent = 'Invalid JSON: ' + e.message;
+                return null;
+            }
+        }
+
+        // -----------------------------------------------------------
+        // PDF GENERATION LOGIC
+        // -----------------------------------------------------------
+        function processAndPrint() {
+            const data = validateJSON();
+            if (!data) return;
+
+            // 1. Randomization
+            const bg = BG_COLORS[Math.floor(Math.random() * BG_COLORS.length)];
+            const set = SETS[Math.floor(Math.random() * SETS.length)];
+            const questions = shuffleArray([...data.questions]);
+            const details = data.details || {};
+
+            // 1.1 Custom Overrides
+            const customTitle = document.getElementById('customTitle').value.trim();
+            const customYear = document.getElementById('customYear').value.trim();
+            const customTime = document.getElementById('customTime').value.trim();
+            const customMarks = document.getElementById('customMarks').value.trim();
+
+            // Look for 'exam_title' specifically as requested, fallback to 'title'
+            const jsonTitle = details.exam_title || details.title;
+            const finalTitle = customTitle || jsonTitle || "প্রিলিমিনারি টেস্ট";
+
+            const finalYear = customYear || details.year || "2026";
+            const finalTime = customTime || details.time || "২ ঘণ্টা";
+            const finalMarks = customMarks || details.full_marks || "200";
+
+            // 2. Apply Print Styles
+            document.body.style.backgroundColor = bg;
+
+            // 3. Build HTML
+            const container = document.getElementById('print-container');
+            container.innerHTML = '';
+
+            // --- CUSTOM FOOTER (Repeating) ---
+            const footer = document.createElement('div');
+            footer.className = 'page-footer';
+            footer.innerHTML = `${finalTitle} | Set: ${set.name} (${set.num})`;
+            container.appendChild(footer);
+
+            /* --- PAGE 1: COVER --- */
+            const coverDiv = document.createElement('div');
+            coverDiv.className = 'page-content-wrapper cover-page';
+
+            coverDiv.innerHTML = `
+                <div class="set-info-top">
+                    <span>সেট নম্বর <br> <span style="font-size:1.5rem">${set.num}</span></span>
+                    <span style="text-align:right">কোড নাম <br> ${set.name}</span>
+                </div>
+                
+                <div class="exam-title-block">
+                    <h1>${finalTitle}</h1>
+                    <div class="exam-year">${toBanglaNum(finalYear)}</div>
+                </div>
+
+                <div class="exam-meta">
+                    সময়: ${finalTime}<br>
+                    পূর্ণমান: ${toBanglaNum(finalMarks)}
+                </div>
+
+                <div class="instructions">
+                    [মোট প্রশ্ন ${toBanglaNum(questions.length)} টি। প্রতিটি প্রশ্নের মান ১। প্রতিটি ভুল উত্তরের জন্য ০.৫ নম্বর কাটা যাবে।]
+                    <div class="instruction-note">
+                        উত্তরপত্রের প্রথম অংশে রেজিস্ট্রেশন নম্বর যথাযথভাবে না লিখলে, সঠিক ঘর ভরাট না করলে উত্তরপত্র বাতিল হবে।
+                    </div>
+                </div>
+            `;
+            container.appendChild(coverDiv);
+
+            // --- PAGE 2+: QUESTIONS (Using Table for Repeating Header) ---
+            const table = document.createElement('table');
+            table.className = 'questions-table';
+            table.style.width = '100%';
+            table.style.borderCollapse = 'collapse';
+            table.style.marginTop = '0'; // Reset
+
+            // THEAD - Repeats on every page
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th style="font-weight:normal; text-align:left; padding-bottom: 0.5rem;">
+                        <div class="questions-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #000; padding-bottom:0.5rem; margin-bottom:1rem; margin-top:1.5rem;">
+                            <span>${set.name}</span>
+                            <span>সেট-${set.num}</span>
+                        </div>
+                    </th>
+                </tr>
+            `;
+            table.appendChild(thead);
+
+            // TBODY - Contains Columns
+            const tbody = document.createElement('tbody');
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+
+            // The column container
+            td.innerHTML = `
+                <div class="question-columns">
+                    ${questions.map((q, idx) => {
+                // Heuristic for layout: Horizontal vs Vertical
+                // Column width approx 80mm ~ 300px. Safe limit ~260px.
+                const MAX_W = 260;
+                const ctx = document.createElement('canvas').getContext('2d');
+                ctx.font = "0.95rem 'Kalpurush', 'Nirmala UI', sans-serif";
+
+                let totalW = 0;
+                let mode = 'horizontal';
+                const vals = [q.options.A, q.options.B, q.options.C, q.options.D];
+
+                for (let v of vals) {
+                    const w = ctx.measureText("(ক) " + v).width;
+                    if (w > MAX_W) { mode = 'vertical'; break; } // Single option too long
+                    totalW += w + 20; // +gap
+                }
+                if (totalW > MAX_W) mode = 'vertical';
+
+                return `
+                        <div class="question-item exam-text">
+                            <span class="q-text">${toBanglaNum(idx + 1)}। ${q.question}</span>
+                            <div class="q-options ${mode}">
+                                <div class="q-opt"><span>(ক)</span> <span>${q.options.A}</span></div>
+                                <div class="q-opt"><span>(খ)</span> <span>${q.options.B}</span></div>
+                                <div class="q-opt"><span>(গ)</span> <span>${q.options.C}</span></div>
+                                <div class="q-opt"><span>(ঘ)</span> <span>${q.options.D}</span></div>
+                            </div>
+                        </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            table.appendChild(tbody);
+
+            // Wrap table in page content style but without fixed padding to avoid double padding if table handles it
+            // Actually, we need the padding wrapper around the table OR inside. 
+            // Better: The Table IS the page content structure essentially.
+            // But we need safe area margins. 
+            // We can wrap the table in a div with padding 25mm 20mm... ? 
+            // No, that wrapper won't fragment well.
+            // Best approach: Give the TABLE styles to respect margin, 
+            // OR put the table inside a div that has the print padding.
+            // Let's use a wrapper for page 2 that enforces padding.
+            const qPageWrapper = document.createElement('div');
+            qPageWrapper.className = 'page-content-wrapper';
+            qPageWrapper.style.display = 'block'; // standard flow
+            qPageWrapper.appendChild(table);
+
+            container.appendChild(qPageWrapper);
+
+            // --- ANSWER KEY ---
+            const ansWrapper = document.createElement('div');
+            ansWrapper.className = 'page-content-wrapper answer-key-section';
+            ansWrapper.innerHTML = `
+                <div class="answer-header">উত্তরমালা</div>
+                <div class="answer-grid">
+                    ${questions.map((q, idx) => `
+                        <div class="answer-item">
+                            ${toBanglaNum(idx + 1)} -> ${BANGLA_OPTIONS[q.answer] || q.answer}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(ansWrapper);
+
+            // --- OMR SHEET ---
+            const omrWrapper = document.createElement('div');
+            omrWrapper.className = 'page-content-wrapper omr-section';
+            omrWrapper.innerHTML = `
+                <div class="omr-header">
+                    <h2>OMR উত্তরপত্র</h2>
+                    <div style="display:flex; justify-content:space-around; font-size:0.9rem; margin-top:5px;">
+                        <span>সেট: ${set.name} (${set.num})</span>
+                        <span>মোট প্রশ্ন: ${toBanglaNum(questions.length)}</span>
+                    </div>
+                    <p style="font-size:0.8rem; margin:5px 0 0 0;">সঠিক বৃত্তটি কালো কালির বলপয়েন্ট কলম দ্বারা ভরাট করুন।</p>
+                </div>
+                <div class="omr-grid-container">
+                    ${questions.map((_, idx) => `
+                        <div class="omr-row">
+                            <span class="omr-q-num">${toBanglaNum(idx + 1)}.</span>
+                            <div class="omr-bubbles">
+                                <div class="omr-bubble">ক</div>
+                                <div class="omr-bubble">খ</div>
+                                <div class="omr-bubble">গ</div>
+                                <div class="omr-bubble">ঘ</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(omrWrapper);
+
+            // 4. Trigger Print
+            // Change document title to suggest filename
+            const originalTitle = document.title;
+            // Use exactly the finalTitle which contains the json exam_title
+            document.title = finalTitle;
+
+            // Small delay to ensure rendering
             setTimeout(() => {
-                successDiv.style.display = 'none';
-            }, 3000);
-        }
-
-        function generateAndCopyLink() {
-            const examId = document.getElementById('examId').value.trim();
-            const generatedLinkDiv = document.getElementById('generatedLink');
-            
-            if (!examId) {
-                showError('Please enter an exam ID!');
-                return;
-            }
-
-            const apiLink = `https://bcspreli.free.nf/api/take-exam/start.php?exam_id=${examId}`;
-            
-            // Copy to clipboard
-            navigator.clipboard.writeText(apiLink).then(() => {
-                showSuccess('✅ API link copied to clipboard!');
-                
-                // Display the link
-                generatedLinkDiv.innerHTML = `
-                    <strong>Generated Link:</strong><br>
-                    <a href="${apiLink}" target="_blank">${apiLink}</a>
-                `;
-                generatedLinkDiv.style.display = 'block';
-            }).catch(err => {
-                showError('Failed to copy link: ' + err.message);
-            });
-        }
-
-        function copyJSON() {
-            const jsonInput = document.getElementById('jsonInput');
-            const content = jsonInput.value.trim();
-
-            if (!content) {
-                showError('No JSON data to copy!');
-                return;
-            }
-
-            navigator.clipboard.writeText(content).then(() => {
-                showSuccess('✅ JSON data copied to clipboard!');
-            }).catch(err => {
-                showError('Failed to copy JSON: ' + err.message);
-            });
-        }
-
-        function fixJSON() {
-            const jsonInput = document.getElementById('jsonInput');
-            let content = jsonInput.value.trim();
-
-            if (!content) {
-                showError('Please paste some JSON data first!');
-                return;
-            }
-
-            try {
-                // Try to fix common JSON issues
-                let fixed = content;
-
-                // Remove any leading/trailing whitespace
-                fixed = fixed.trim();
-
-                // Fix single quotes to double quotes
-                fixed = fixed.replace(/'/g, '"');
-
-                // Remove trailing commas before closing brackets/braces
-                fixed = fixed.replace(/,(\s*[}\]])/g, '$1');
-
-                // Add missing commas between objects in arrays
-                fixed = fixed.replace(/}(\s*){/g, '},\n{');
-                
-                // Fix unquoted keys (basic attempt)
-                fixed = fixed.replace(/(\w+):/g, '"$1":');
-
-                // Remove duplicate quotes
-                fixed = fixed.replace(/""+/g, '"');
-
-                // Try to parse it
-                let parsed = JSON.parse(fixed);
-
-                // Validate structure
-                const data = parsed.data || parsed;
-                
-                if (!data.details) {
-                    // Try to create a basic structure
-                    if (!parsed.data) {
-                        parsed = { data: parsed };
-                    }
-                    if (!parsed.data.details) {
-                        parsed.data.details = {
-                            duration: 60,
-                            total_marks: "100.00"
-                        };
-                    }
-                }
-
-                if (!data.questions || !Array.isArray(data.questions)) {
-                    throw new Error('Questions array not found or invalid');
-                }
-
-                // Validate and fix each question
-                parsed.data.questions = data.questions.map((q, index) => {
-                    const fixedQ = {
-                        id: q.id || (2781 + index),
-                        question: q.question || `Question ${index + 1}`,
-                        options: {},
-                        answer: q.answer || 'A'
-                    };
-
-                    // Fix options
-                    if (q.options) {
-                        if (Array.isArray(q.options)) {
-                            // Convert array to object
-                            fixedQ.options = {
-                                A: q.options[0] || 'Option A',
-                                B: q.options[1] || 'Option B',
-                                C: q.options[2] || 'Option C',
-                                D: q.options[3] || 'Option D'
-                            };
-                        } else {
-                            fixedQ.options = {
-                                A: q.options.A || q.options.a || 'Option A',
-                                B: q.options.B || q.options.b || 'Option B',
-                                C: q.options.C || q.options.c || 'Option C',
-                                D: q.options.D || q.options.d || 'Option D'
-                            };
-                        }
-                    } else {
-                        fixedQ.options = {
-                            A: 'Option A',
-                            B: 'Option B',
-                            C: 'Option C',
-                            D: 'Option D'
-                        };
-                    }
-
-                    return fixedQ;
-                });
-
-                // Format nicely with indentation
-                const formatted = JSON.stringify(parsed, null, 2);
-                jsonInput.value = formatted;
-                
-                showSuccess(`✅ JSON fixed successfully! Found ${data.questions.length} questions.`);
-            } catch (e) {
-                // If parsing still fails, try more aggressive fixes
-                try {
-                    // Last resort: try to extract what looks like JSON
-                    const jsonMatch = content.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        let extracted = jsonMatch[0];
-                        extracted = extracted.replace(/'/g, '"');
-                        extracted = extracted.replace(/,(\s*[}\]])/g, '$1');
-                        const parsed = JSON.parse(extracted);
-                        jsonInput.value = JSON.stringify(parsed, null, 2);
-                        showSuccess('✅ JSON partially recovered and formatted!');
-                    } else {
-                        throw new Error('Could not extract valid JSON');
-                    }
-                } catch (finalError) {
-                    showError(`❌ Could not fix JSON: ${e.message}. Please check your JSON structure manually.`);
-                }
-            }
-        }
-
-        async function generatePDF() {
-            const jsonInput = document.getElementById('jsonInput').value.trim();
-            const generateBtn = document.getElementById('generateBtn');
-            
-            if (!jsonInput) {
-                showError('Please paste JSON data first!');
-                return;
-            }
-
-            let data;
-
-            try {
-                generateBtn.disabled = true;
-                generateBtn.textContent = 'Generating PDF...';
-
-                // Parse JSON input
-                try {
-                    const parsedData = JSON.parse(jsonInput);
-                    data = parsedData.data || parsedData;
-                } catch (parseError) {
-                    showError('Invalid JSON format! Please check your data.');
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = 'Create MCQ PDF';
-                    return;
-                }
-
-                if (!data.details || !data.questions) {
-                    showError('Data must contain "details" and "questions" fields!');
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = 'Create MCQ PDF';
-                    return;
-                }
-
-                await createPDF(data);
-                
-                showSuccess('PDF generated successfully!');
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Create MCQ PDF';
-            } catch (e) {
-                showError('Error generating PDF: ' + e.message);
-                console.error(e);
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Create MCQ PDF';
-            }
-        }
-
-        function renderQuestionHTML(q, index) {
-            const questionNum = toBanglaNumber(index + 1);
-            const optionsArray = ['A', 'B', 'C', 'D'].map(key => q.options[key]);
-
-            return `
-                <div class="question-item">
-                    <div>
-                        <span class="question-number">${questionNum}.</span>
-                        <span class="question-text"> ${q.question}</span>
-                    </div>
-                    <div class="options">
-                        ${optionsArray.map((opt, optIdx) => `
-                            <div class="option-item">
-                                <span class="option-label">${banglaOptions[optIdx]})</span> ${opt}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        async function createPDF(data) {
-            const pdfContent = document.getElementById('pdfContent');
-            
-            // Convert duration and total_marks to Bangla
-            const duration = toBanglaNumber(data.details.duration);
-            const totalMarks = toBanglaNumber(parseFloat(data.details.total_marks).toFixed(0));
-
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const maxPageHeight = 900; // Maximum content height in pixels for a page (leaving space for header)
-            
-            let currentQuestionIndex = 0;
-            let isFirstPage = true;
-
-            // Generate pages dynamically based on content height
-            while (currentQuestionIndex < data.questions.length) {
-                const tempDiv = document.createElement('div');
-                tempDiv.style.position = 'fixed';
-                tempDiv.style.left = '-10000px';
-                tempDiv.style.width = '331px';
-                tempDiv.style.fontFamily = 'Arial, sans-serif';
-                document.body.appendChild(tempDiv);
-
-                // Build column 1
-                let col1HTML = '';
-                let col1QuestionCount = 0;
-                tempDiv.innerHTML = '';
-                
-                while (currentQuestionIndex + col1QuestionCount < data.questions.length) {
-                    const testHTML = col1HTML + renderQuestionHTML(
-                        data.questions[currentQuestionIndex + col1QuestionCount],
-                        currentQuestionIndex + col1QuestionCount
-                    );
-                    tempDiv.innerHTML = testHTML;
-                    
-                    if (tempDiv.scrollHeight > maxPageHeight && col1QuestionCount > 0) {
-                        break;
-                    }
-                    
-                    col1HTML = testHTML;
-                    col1QuestionCount++;
-                }
-
-                const col1EndIndex = currentQuestionIndex + col1QuestionCount;
-
-                // Build column 2
-                let col2HTML = '';
-                let col2QuestionCount = 0;
-                tempDiv.innerHTML = '';
-                
-                while (col1EndIndex + col2QuestionCount < data.questions.length) {
-                    const testHTML = col2HTML + renderQuestionHTML(
-                        data.questions[col1EndIndex + col2QuestionCount],
-                        col1EndIndex + col2QuestionCount
-                    );
-                    tempDiv.innerHTML = testHTML;
-                    
-                    if (tempDiv.scrollHeight > maxPageHeight && col2QuestionCount > 0) {
-                        break;
-                    }
-                    
-                    col2HTML = testHTML;
-                    col2QuestionCount++;
-                }
-
-                document.body.removeChild(tempDiv);
-
-                // Render the page
-                const htmlContent = `
-                    <div class="pdf-page">
-                        <div class="pdf-header">
-                            <div class="pdf-main-title">প্রিলিমানরি টেস্ট</div>
-                            <div class="pdf-sub-title">২০২৭</div>
-                            <div class="pdf-details">সময় - ${duration} ঘন্টা ; পূর্ণমান - ${totalMarks} [প্রতিটি প্রশ্নের ৪ (চার)টি উত্তরের মধ্যে ১(এক)টি সঠিক উত্তর রয়েছে।  প্রতিটি শুদ্ধ উত্তরের জন্য প্রার্থী ১(এক) নম্বর পাবেন।  প্রতিটি ভুল উত্তরের জন্য জন্য ০.৫ ( শূন্য দশমিক পাঁচ ) নম্বর কাটা যাবে।  [
-
-উত্তরপত্রের প্রথম অংশে রেজিস্ট্রেশন নম্বর যথাযথভাবে না লিখলে , সঠিকভাবে বৃত্ত ভরাট না করলে অথবা বৃত্ত ভরাটের ক্ষেত্রে কাটাকাটি করলে উত্তরপত্র বাতিল হবে। </div>
-                        </div>
-                        <div class="pdf-body">
-                            <div class="pdf-column">
-                                ${col1HTML}
-                            </div>
-                            <div class="pdf-column">
-                                ${col2HTML}
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                pdfContent.innerHTML = htmlContent;
-                pdfContent.style.left = '0';
-
-                await new Promise(resolve => setTimeout(resolve, 300));
-
-                const canvas = await html2canvas(pdfContent, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    width: 793,
-                    height: 1122
-                });
-
-                pdfContent.style.left = '-10000px';
-
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                
-                if (!isFirstPage) {
-                    pdf.addPage();
-                }
-                
-                pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-                isFirstPage = false;
-
-                currentQuestionIndex = col1EndIndex + col2QuestionCount;
-            }
-
-            // Generate answer key page
-            pdf.addPage();
-            
-            const answerKeyHTML = `
-                <div class="answer-key-page">
-                    <div class="answer-key-title">উত্তরমালা (Answer Key)</div>
-                    <div class="answer-grid">
-                        ${data.questions.map((q, idx) => {
-                            const questionNum = toBanglaNumber(idx + 1);
-                            const answerBangla = englishToBangla[q.answer] || q.answer;
-                            return `
-                                <div class="answer-item">
-                                    <span class="answer-num">${questionNum}.</span>
-                                    <span class="answer-value">${answerBangla}</span>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </div>
-            `;
-
-            pdfContent.innerHTML = answerKeyHTML;
-            pdfContent.style.left = '0';
-
-            await new Promise(resolve => setTimeout(resolve, 300));
-
-            const answerCanvas = await html2canvas(pdfContent, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                width: 793,
-                height: 1122
-            });
-
-            pdfContent.style.left = '-10000px';
-
-            const answerImgData = answerCanvas.toDataURL('image/jpeg', 1.0);
-            pdf.addImage(answerImgData, 'JPEG', 0, 0, 210, 297);
-
-            pdf.save('primary_mcq_questions.pdf');
-            pdfContent.innerHTML = '';
+                window.print();
+                // Restore title after a delay (enough for dialog to open)
+                setTimeout(() => { document.title = originalTitle; }, 2000);
+            }, 500);
         }
     </script>
 </body>
+
 </html>
-
-
